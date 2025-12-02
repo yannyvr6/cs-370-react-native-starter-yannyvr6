@@ -3,6 +3,7 @@ import { SafeAreaView, ScrollView, View, Text, Image, TouchableOpacity, StyleShe
 import { useRouter } from "expo-router";
 import CustomButton from "../component/customButton";
 import CustomFormField from "../component/CustomFormField";
+import { supabase } from "../lib/supabaseClient";
 
 export default function SignIn() {
   const router = useRouter();
@@ -10,13 +11,22 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log("Signed in with", { email, password });
-      router.push("/(tabs)/home"); // Navigate to your main app
-    }, 1500);
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    setIsLoading(false);
+
+    if (error) {
+      alert(error.message);
+    } else {
+      alert("Signed in successfully!");
+      router.push("/(tabs)/home"); // navigate to main app
+    }
   };
 
   return (
