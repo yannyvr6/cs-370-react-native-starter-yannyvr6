@@ -1,7 +1,7 @@
 import React from "react";
 import { SafeAreaView, ScrollView, View, Text, Image, StatusBar, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import customButton from './customButton';
+import CustomButton from "./component/customButton";
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -22,7 +22,7 @@ export default function OnboardingScreen() {
           <Text style={styles.subtitle}>
             Your journey starts here. Explore, learn, and grow with Aura.
           </Text>
-          <customButton
+          <CustomButton
             title="Get Started"
             handlePress={() => router.push("/sign-in")}
             isLoading={false}
@@ -41,4 +41,3 @@ const styles = StyleSheet.create({
   headline: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 8 },
   subtitle: { textAlign: "center", color: "#6B7280", marginBottom: 24 },
 });
-

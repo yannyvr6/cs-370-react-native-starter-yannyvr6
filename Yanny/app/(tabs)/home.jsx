@@ -23,13 +23,6 @@ export default function HomeScreen() {
             </Text>
           </Pressable>
         </Link>
-
-        {/* Additional Info */}
-        <View className="mt-8 p-4 bg-blue-50 rounded-lg">
-          <Text className="text-sm text-gray-600 text-center">
-            Using NativeWind + Tailwind CSS for styling
-          </Text>
-        </View>
       </View>
     </ScrollView>
   );
