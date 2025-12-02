@@ -2,31 +2,36 @@ import { Tabs } from "expo-router";
 import { View, Text, Image } from "react-native";
 import { icons } from "../../constants";
 
-const TabIcon = ({ icon, color, name, focused }: { icon: any; color: string; name: string; focused: boolean }) => {
-  return (
-    <View style={{ alignItems: "center", justifyContent: "center" }}>
-      <Image
-        source={icon}
-        style={{
-          width: 24,
-          height: 24,
-          tintColor: color,
-          resizeMode: "contain",
-        }}
-      />
-      <Text
-        style={{
-          fontSize: 12,
-          color,
-          fontWeight: focused ? "bold" : "normal",
-          marginTop: 4,
-        }}
-      >
-        {name}
-      </Text>
-    </View>
-  );
-};
+interface TabIconProps {
+  icon: any;
+  color: string;
+  name: string;
+  focused: boolean;
+}
+
+const TabIcon = ({ icon, color, name, focused }: TabIconProps) => (
+  <View style={{ alignItems: "center", justifyContent: "center" }}>
+    <Image
+      source={icon}
+      style={{
+        width: 24,
+        height: 24,
+        tintColor: color,
+        resizeMode: "contain",
+      }}
+    />
+    <Text
+      style={{
+        fontSize: 12,
+        color,
+        fontWeight: focused ? "bold" : "normal",
+        marginTop: 4,
+      }}
+    >
+      {name}
+    </Text>
+  </View>
+);
 
 export default function TabsLayout() {
   return (
@@ -69,7 +74,7 @@ export default function TabsLayout() {
         options={{
           title: "Create",
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon icon={icons.plus} color={color} name="Create" focused={focused} />
+            <TabIcon icon={icons.create} color={color} name="Create" focused={focused} />
           ),
         }}
       />

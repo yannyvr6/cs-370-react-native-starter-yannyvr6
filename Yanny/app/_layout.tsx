@@ -21,7 +21,7 @@ export default function RootLayout() {
   
   // Load fonts
   const [fontsLoaded, fontError] = useFonts({
-    'SpaceMono-Regular': require('../assets/fonts/SpaceMono-Regular.ttf'),
+    'SpaceMono-Regular': require('C:\\Users\\yanny\\OneDrive\\Desktop\\CS370\\week2\\cs-370-react-native-starter-yannyvr6\\Yanny\\assets\\fonts\\Space_Mono\\SpaceMono-Regular.ttf'),
     // Add more custom fonts here if you have them
     // 'YourFont-Bold': require('../assets/fonts/YourFont-Bold.ttf'),
   });
