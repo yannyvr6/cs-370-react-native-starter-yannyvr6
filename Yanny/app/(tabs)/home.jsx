@@ -1,29 +1,39 @@
-import { View, Text, Pressable, ScrollView } from 'react-native';
-import { Link } from 'expo-router';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { useGlobal } from "../../context/GlobalContext";
+import CustomButton from "../../component/customButton";
+import { signOut } from "../../lib/supabaseClient";
+import { useRouter } from "expo-router";
 
+export default function Home() {
+  const { user, setUser, setIsLoggedIn } = useGlobal();
+  const router = useRouter();
 
-export default function HomeScreen() {
+  const handleSignOut = async () => {
+    await signOut();
+    setUser(null);
+    setIsLoggedIn(false);
+    router.replace("/(auth)/sign-in");
+  };
+
   return (
-    <ScrollView className="flex-1 bg-background">
-      <View className="flex-1 items-center justify-center p-6 pt-20">
-        {/* Welcome Section */}
-        <View className="items-center mb-8">
-          <Text className="text-4xl font-bold text-text mb-2">Welcome! 👋</Text>
-          <Text className="text-lg text-gray-600 text-center">
-            Yanny's App with Expo Router
-          </Text>
-        </View>
-
-
-   {/* Navigation Button to Profile */}
-        <Link href="/profile" asChild>
-          <Pressable className="mt-8 bg-primary px-8 py-4 rounded-lg shadow-md active:opacity-80">
-            <Text className="text-white text-lg font-semibold text-center">
-              Go to Profile
-            </Text>
-          </Pressable>
-        </Link>
-      </View>
-    </ScrollView>
+    <View style={styles.container}>
+      <Text style={styles.title}>Welcome Home!</Text>
+      <Text style={styles.subtitle}>
+        Logged in as: {user?.email}
+      </Text>
+      <Text style={styles.username}>
+        Username: {user?.user_metadata?.username || "N/A"}
+      </Text>
+      
+      <CustomButton title="Sign Out" handlePress={handleSignOut} />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 24, justifyContent: "center" },
+  title: { fontSize: 30, fontWeight: "bold", marginBottom: 12 },
+  subtitle: { fontSize: 18, color: "#6B7280", marginBottom: 8 },
+  username: { fontSize: 16, color: "#6B7280", marginBottom: 24 },
+});

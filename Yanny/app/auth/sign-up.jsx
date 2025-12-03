@@ -1,78 +1,131 @@
 import React, { useState } from "react";
-import { SafeAreaView, ScrollView, View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
+import CustomButton from "../../component/customButton";
 import { useRouter } from "expo-router";
-import CustomButton from "../component/customButton";
-import CustomFormField from "../component/CustomFormField";
-import { supabase } from "../lib/supabaseClient";
+import { useGlobal } from "../context/GlobalContext";
+import { createUser } from "../lib/supabaseClient";
 
 export default function SignUp() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const { setUser, setIsLoggedIn } = useGlobal();
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignUp = async () => {
+    // Validate input
+    if (!email || !password || !username) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    // Basic password validation
+    if (password.length < 6) {
+      Alert.alert("Error", "Password must be at least 6 characters");
+      return;
+    }
+
     setIsLoading(true);
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { username } }, // store username in user metadata
-    });
+    try {
+      const result = await createUser(email, password, username);
 
-    setIsLoading(false);
-
-    if (error) {
-      alert(error.message);
-    } else {
-      alert("Sign up successful! Please check your email to confirm.");
-      router.push("/auth/SignIn");
+      if (result.success) {
+        Alert.alert(
+          "Success", 
+          "Account created successfully!",
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                setUser(result.user);
+                setIsLoggedIn(true);
+                // Navigation will be handled automatically by GlobalContext
+              }
+            }
+          ]
+        );
+      } else {
+        Alert.alert("Sign Up Failed", result.error);
+      }
+    } catch (error) {
+      Alert.alert("Error", "An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <Image source={require("../../assets/heroImage.png")} style={styles.logo} />
-        <Text style={styles.title}>Sign Up</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Create Account</Text>
 
-        <CustomFormField
-          label="Username"
-          placeholder="Enter your username"
-          value={username}
-          onChangeText={setUsername}
-        />
-        <CustomFormField
-          label="Email"
-          placeholder="Enter your email"
-          value={email}
-          onChangeText={setEmail}
-        />
-        <CustomFormField
-          label="Password"
-          placeholder="Enter your password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+      <TextInput
+        placeholder="Username"
+        style={styles.input}
+        value={username}
+        onChangeText={setUsername}
+        autoCapitalize="none"
+        editable={!isLoading}
+      />
 
-        <CustomButton title="Sign Up" handlePress={handleSignUp} isLoading={isLoading} />
+      <TextInput
+        placeholder="Email"
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        editable={!isLoading}
+      />
 
-        <View style={{ flexDirection: "row", marginTop: 16 }}>
-          <Text>Already have an account? </Text>
-          <TouchableOpacity onPress={() => router.push("/auth/SignIn")}>
-            <Text style={{ color: "#2563EB", fontWeight: "bold" }}>Sign In</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      <TextInput
+        placeholder="Password"
+        style={styles.input}
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        autoCapitalize="none"
+        editable={!isLoading}
+      />
+
+      <CustomButton 
+        title="Sign Up" 
+        handlePress={handleSignUp}
+        isLoading={isLoading}
+      />
+
+      <Text style={styles.linkText}>
+        Already have an account?{" "}
+        <Text
+          style={styles.link}
+          onPress={() => router.push("/(auth)/sign-in")}
+        >
+          Sign In
+        </Text>
+      </Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#fff" },
-  container: { flexGrow: 1, justifyContent: "center", alignItems: "center", padding: 24 },
-  logo: { width: 120, height: 120, marginBottom: 24 },
+  container: { flex: 1, padding: 24, justifyContent: "center" },
   title: { fontSize: 28, fontWeight: "bold", marginBottom: 24 },
+  input: {
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  linkText: {
+    marginTop: 16,
+    textAlign: "center",
+    color: "#6B7280",
+  },
+  link: {
+    color: "#2563EB",
+    fontWeight: "600",
+  },
 });

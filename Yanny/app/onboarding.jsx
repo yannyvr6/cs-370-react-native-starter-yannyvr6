@@ -1,5 +1,5 @@
 import React from "react";
-import { SafeAreaView, ScrollView, View, Text, Image, StatusBar, StyleSheet } from "react-native";
+import { SafeAreaView, ScrollView, View, Text, Image, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import CustomButton from "./component/customButton";
 
@@ -8,20 +8,20 @@ export default function OnboardingScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.content}>
           <Image
-            source={require('../assets/heroImage.png')}
+            source={require("../assets/heroImage.png")}
             style={styles.image}
             resizeMode="contain"
           />
-          <Text style={styles.headline}>
-            Discover Endless Possibilities with Aura
-          </Text>
+
+          <Text style={styles.headline}>Discover Endless Possibilities with Aura</Text>
+
           <Text style={styles.subtitle}>
             Your journey starts here. Explore, learn, and grow with Aura.
           </Text>
+
           <CustomButton
             title="Get Started"
             handlePress={() => router.push("/sign-in")}
