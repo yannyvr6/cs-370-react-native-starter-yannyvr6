@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
-import CustomButton from "../../component/customButton";
+import CustomButton from "../component/customButton";
 import { useRouter } from "expo-router";
-import { useGlobal } from "../context/GlobalContext";
-import { createUser } from "../lib/supabaseClient";
+import { useGlobal } from "../../context/GlobalContext";
+import { createUser } from "../../lib/supabaseClient";
 
 export default function SignUp() {
   const router = useRouter();
@@ -63,6 +63,7 @@ export default function SignUp() {
 
       <TextInput
         placeholder="Username"
+        placeholderTextColor="#7B7B8B"
         style={styles.input}
         value={username}
         onChangeText={setUsername}
@@ -72,6 +73,7 @@ export default function SignUp() {
 
       <TextInput
         placeholder="Email"
+        placeholderTextColor="#7B7B8B"
         style={styles.input}
         value={email}
         onChangeText={setEmail}
@@ -82,6 +84,7 @@ export default function SignUp() {
 
       <TextInput
         placeholder="Password"
+        placeholderTextColor="#7B7B8B"
         style={styles.input}
         value={password}
         onChangeText={setPassword}
@@ -100,7 +103,7 @@ export default function SignUp() {
         Already have an account?{" "}
         <Text
           style={styles.link}
-          onPress={() => router.push("/(auth)/sign-in")}
+          onPress={() => router.push("./auth/sign-in")}
         >
           Sign In
         </Text>
@@ -110,11 +113,13 @@ export default function SignUp() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, justifyContent: "center" },
-  title: { fontSize: 28, fontWeight: "bold", marginBottom: 24 },
+  container: { flex: 1, padding: 24, justifyContent: "center", backgroundColor: "#161622" },
+  title: { fontSize: 28, fontWeight: "bold", marginBottom: 24, color: "#FFFFFF" },
   input: {
     borderWidth: 1,
-    borderColor: "#D1D5DB",
+    borderColor: "#232533",
+    backgroundColor: "#1E1E2D",
+    color: "#FFFFFF",
     padding: 12,
     borderRadius: 8,
     marginBottom: 16,
@@ -122,10 +127,10 @@ const styles = StyleSheet.create({
   linkText: {
     marginTop: 16,
     textAlign: "center",
-    color: "#6B7280",
+    color: "#CDCDE0",
   },
   link: {
-    color: "#2563EB",
+    color: "#FF9C01",
     fontWeight: "600",
   },
 });
