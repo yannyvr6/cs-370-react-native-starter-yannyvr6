@@ -13,9 +13,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useGlobal } from "../../context/GlobalContext";
 import { signOut } from "../../lib/supabaseClient";
 import { useRouter } from "expo-router";
+
 import SearchInput from "../component/SearchInput";
 import Trending from "../component/Trending";
 import VideoCard from "../component/VideoCard";
+import EmptyState from "../component/EmptyState";
 import { icons, images } from "../../constants";
 
 // ---------- Types ----------
@@ -185,11 +187,7 @@ export default function Home() {
             colors={["#FF9C01"]}
           />
         }
-        ListEmptyComponent={() => (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No videos found</Text>
-          </View>
-        )}
+        ListEmptyComponent={() => <EmptyState />}
       />
     </SafeAreaView>
   );
@@ -259,10 +257,4 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingHorizontal: 16,
   },
-  emptyContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 40,
-  },
-  emptyText: { fontSize: 14, color: "#CDCDE0" },
 });

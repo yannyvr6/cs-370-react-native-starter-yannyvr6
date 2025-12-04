@@ -9,7 +9,7 @@ export default function EmptyState() {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/images/empty.png")} // change to your actual path
+        source={require("C:\\Users\\yanny\\OneDrive\\Desktop\\CS370\\week2\\cs-370-react-native-starter-yannyvr6\\Yanny\\assets\\images\\empty.png")}
         style={styles.image}
       />
 
