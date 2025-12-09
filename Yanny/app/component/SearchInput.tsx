@@ -1,65 +1,25 @@
-import React, { useState } from "react";
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
+import { View, TextInput, Image, TouchableOpacity } from "react-native";
+import { useState } from "react";
 
-interface SearchInputProps {
-  initialQuery?: string;
-}
-
-export default function SearchInput({ initialQuery }: SearchInputProps) {
-  const [query, setQuery] = useState(initialQuery || "");
-  const router = useRouter();
-
-  const handleSearch = () => {
-    if (!query) {
-      return;
-    }
-    router.push({
-      pathname: "./search/[query]",
-      params: { query },
-    });
-  };
+export default function SearchInput() {
+  const [query, setQuery] = useState("");
 
   return (
-    <View style={styles.container}>
+    <View className="bg-neutral-800 rounded-xl flex-row items-center px-4 py-3 mt-4">
       <TextInput
-        style={styles.input}
-        value={query}
         placeholder="Search for a video topic"
-        placeholderTextColor="#CDCDE0"
+        placeholderTextColor="#aaa"
+        className="flex-1 text-white"
+        value={query}
         onChangeText={setQuery}
-        onSubmitEditing={handleSearch}
       />
-      <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
-        <Text style={styles.searchIcon}>🔍</Text>
+
+      <TouchableOpacity onPress={() => console.log("Search clicked!")}>
+        <Image
+          source={require("../assets/search.png")}
+          className="w-5 h-5 ml-2"
+        />
       </TouchableOpacity>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#1E1E2D",
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: "#232533",
-    paddingHorizontal: 16,
-    height: 64,
-    marginHorizontal: 16,
-    marginTop: 28,
-  },
-  input: {
-    flex: 1,
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  searchButton: {
-    padding: 8,
-  },
-  searchIcon: {
-    fontSize: 20,
-  },
-});

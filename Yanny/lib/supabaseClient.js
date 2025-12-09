@@ -2,8 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
-const SUPABASE_URL = 'https://foueonivzttceyeshqml.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_secret_gIHsoKcWttk2iDlnqYVy4g_4MIfx-Wo';
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 // Only use AsyncStorage on native platforms, not web
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
