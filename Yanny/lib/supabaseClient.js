@@ -1,12 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
-const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+// Get Supabase credentials from app.json extra
+const { supabaseUrl, supabaseAnonKey } = Constants.manifest.extra;
 
-// Only use AsyncStorage on native platforms, not web
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Supabase URL and anon key are required. Check your app.json extra fields.');
+}
+
+// Create Supabase client
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: Platform.OS === 'web' ? undefined : AsyncStorage,
     autoRefreshToken: true,
@@ -15,18 +20,17 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
 });
 
+// -------------------- Auth Functions -------------------- //
+
 // Create a new user account
 export async function createUser(email, password, username) {
   try {
-    // Sign up the user with Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: {
-          username: username,
-        }
-      }
+        data: { username },
+      },
     });
 
     if (authError) throw authError;
@@ -71,9 +75,7 @@ export async function signOut() {
 export async function getCurrentUser() {
   try {
     const { data: { session }, error } = await supabase.auth.getSession();
-    
     if (error) throw error;
-    
     return session?.user || null;
   } catch (error) {
     console.error('Error getting current user:', error);

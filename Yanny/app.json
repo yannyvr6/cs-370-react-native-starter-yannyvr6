@@ -7,7 +7,10 @@
     "icon": "./assets/images/icon.png",
     "scheme": "yanny",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "extra": {
+      "supabaseUrl": "https://foueonivzttceyeshqml.supabase.co",
+      "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvdWVvbml2enR0Y2V5ZXNocW1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3MDM1NTgsImV4cCI6MjA4MDI3OTU1OH0.7eMOAFkS4GVVPYICpcximk77bLIK2H3i9xTC0HvwkRo"
+    },
     "ios": {
       "supportsTablet": true
     },

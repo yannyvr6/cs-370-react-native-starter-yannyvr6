@@ -16,7 +16,7 @@ export default function SearchInput() {
 
       <TouchableOpacity onPress={() => console.log("Search clicked!")}>
         <Image
-          source={require("../assets/search.png")}
+          source={require("../../assets/images/search.png")}
           className="w-5 h-5 ml-2"
         />
       </TouchableOpacity>
