@@ -1,7 +1,13 @@
 import React from "react";
 import { TouchableOpacity, Text, ActivityIndicator, StyleSheet } from "react-native";
 
-export default function CustomButton({ title, handlePress, isLoading }) {
+interface CustomButtonProps {
+  title: string;
+  handlePress: () => void;
+  isLoading: boolean;
+}
+
+export default function CustomButton({ title, handlePress, isLoading }: CustomButtonProps) {
   return (
     <TouchableOpacity
       style={styles.button}
