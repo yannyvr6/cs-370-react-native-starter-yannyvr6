@@ -13,7 +13,7 @@ interface Video {
   title: string;
   url: string;
   creator?: string;
-  thumbnail?: string;
+  thumbnail_url?: string;
 }
 
 export default function Home() {

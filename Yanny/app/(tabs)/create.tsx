@@ -1,21 +1,22 @@
 import React, { useState } from "react";
 import {  View,  Text,  ScrollView,  TouchableOpacity,  Image,  ActivityIndicator,  Alert,  StyleSheet, } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as DocumentPicker from "expo-document-picker";
-import { supabase } from "../../lib/supabaseClient";
+import * as ImagePicker from "expo-image-picker";import { supabase } from "../../lib/supabaseClient";
 import { useGlobal } from "../../context/GlobalContext";
 import FormField from "../component/FormField";
 import { useRouter } from "expo-router";
 
 // Helper to upload file to Supabase storage and get public URL
 async function uploadFile(file: any, folder: string) {
-  const fileExt = file.name.split(".").pop();
+  const fileExt = file.uri.split(".").pop();
   const fileName = `${Date.now()}.${fileExt}`;
   const filePath = `${folder}/${fileName}`;
 
   const { error } = await supabase.storage
     .from(folder)
-    .upload(filePath, await fetch(file.uri).then((r) => r.blob()));
+    .upload(filePath, await fetch(file.uri).then((r) => r.blob()), {
+      contentType: file.type,
+    });
 
   if (error) throw error;
 
@@ -38,13 +39,11 @@ async function createVideo({
   userId: string;
 }) {
   try {
-    // Upload video and thumbnail simultaneously
     const [videoUrl, thumbnailUrl] = await Promise.all([
       uploadFile(videoFile, "videos"),
       uploadFile(thumbnailFile, "thumbnails"),
     ]);
 
-    // Insert metadata into the videos table
     const { error } = await supabase.from("videos").insert([
       {
         title,
@@ -73,16 +72,30 @@ export default function Create() {
   const [thumbnailFile, setThumbnailFile] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  // Pick a file (video or thumbnail)
+  // Pick a file (video or thumbnail) using ImagePicker
   const openPicker = async (type: "video" | "image") => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: type === "video" ? "video/*" : "image/*",
-      copyToCacheDirectory: true,
+    const mediaType =
+      type === "video"
+        ? ImagePicker.MediaTypeOptions.Videos
+        : ImagePicker.MediaTypeOptions.Images;
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: mediaType,
+      allowsEditing: false,
+      quality: 1,
     });
 
     if (!result.canceled) {
-      if (type === "video") setVideoFile(result.assets[0]);
-      else setThumbnailFile(result.assets[0]);
+      const file = result.assets[0];
+
+      // Validate file size (<50 MB)
+      if (file.fileSize && file.fileSize > 50 * 1024 * 1024) {
+        Alert.alert("File too large", "Please select a file smaller than 50 MB.");
+        return;
+      }
+
+      if (type === "video") setVideoFile(file);
+      else setThumbnailFile(file);
     }
   };
 
@@ -131,28 +144,15 @@ export default function Create() {
 
         {/* Video Picker */}
         <Text style={styles.label}>Video</Text>
-        <TouchableOpacity
-          style={styles.uploadBox}
-          onPress={() => openPicker("video")}
-        >
-          {videoFile ? (
-            <Text>{videoFile.name}</Text>
-          ) : (
-            <Text style={styles.uploadText}>Select Video</Text>
-          )}
+        <TouchableOpacity style={styles.uploadBox} onPress={() => openPicker("video")}>
+          {videoFile ? <Text>{videoFile.name}</Text> : <Text style={styles.uploadText}>Select Video</Text>}
         </TouchableOpacity>
 
         {/* Thumbnail Picker */}
         <Text style={styles.label}>Thumbnail</Text>
-        <TouchableOpacity
-          style={styles.uploadBox}
-          onPress={() => openPicker("image")}
-        >
+        <TouchableOpacity style={styles.uploadBox} onPress={() => openPicker("image")}>
           {thumbnailFile ? (
-            <Image
-              source={{ uri: thumbnailFile.uri }}
-              style={{ width: 100, height: 100 }}
-            />
+            <Image source={{ uri: thumbnailFile.uri }} style={{ width: 100, height: 100 }} />
           ) : (
             <Text style={styles.uploadText}>Select Thumbnail</Text>
           )}
@@ -166,11 +166,7 @@ export default function Create() {
         />
 
         <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} disabled={loading}>
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.submitText}>Upload Video</Text>
-          )}
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>Upload Video</Text>}
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
