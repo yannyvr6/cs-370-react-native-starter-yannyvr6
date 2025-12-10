@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getLatestPosts } from "../../lib/posts";
+import { supabase } from "../../lib/supabaseClient";
 
 export function useLatestPosts(limit = 7) {
   const [latestVideos, setLatestVideos] = useState([]);
@@ -7,8 +7,16 @@ export function useLatestPosts(limit = 7) {
 
   const fetchLatest = useCallback(async () => {
     setLoading(true);
-    const data = await getLatestPosts(limit);
-    setLatestVideos(data || []);
+
+    const { data, error } = await supabase
+      .from("videos")
+      .select("id, title, url, thumbnail_url, creator_id, created_at")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (!error && data) setLatestVideos(data);
+    else setLatestVideos([]);
+
     setLoading(false);
   }, [limit]);
 

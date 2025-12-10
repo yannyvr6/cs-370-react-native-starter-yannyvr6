@@ -7,6 +7,62 @@ import { useGlobal } from "../../context/GlobalContext";
 import FormField from "../component/FormField";
 import { useRouter } from "expo-router";
 
+// Helper to upload file to Supabase storage and get public URL
+async function uploadFile(file: any, folder: string) {
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${Date.now()}.${fileExt}`;
+  const filePath = `${folder}/${fileName}`;
+
+  const { error } = await supabase.storage
+    .from(folder)
+    .upload(filePath, await fetch(file.uri).then((r) => r.blob()));
+
+  if (error) throw error;
+
+  const { data: publicUrlData } = supabase.storage.from(folder).getPublicUrl(filePath);
+  return publicUrlData.publicUrl;
+}
+
+// Create video metadata in the database
+async function createVideo({
+  title,
+  aiPrompt,
+  videoFile,
+  thumbnailFile,
+  userId,
+}: {
+  title: string;
+  aiPrompt: string;
+  videoFile: any;
+  thumbnailFile: any;
+  userId: string;
+}) {
+  try {
+    // Upload video and thumbnail simultaneously
+    const [videoUrl, thumbnailUrl] = await Promise.all([
+      uploadFile(videoFile, "videos"),
+      uploadFile(thumbnailFile, "thumbnails"),
+    ]);
+
+    // Insert metadata into the videos table
+    const { error } = await supabase.from("videos").insert([
+      {
+        title,
+        url: videoUrl,
+        thumbnail_url: thumbnailUrl,
+        ai_prompt: aiPrompt,
+        creator_id: userId,
+      },
+    ]);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error("Error creating video:", err);
+    return { success: false, error: (err as any).message };
+  }
+}
+
 export default function Create() {
   const { user } = useGlobal();
   const router = useRouter();
@@ -30,49 +86,25 @@ export default function Create() {
     }
   };
 
-  // Upload file to Supabase storage
-  const uploadFile = async (file: any, folder: string) => {
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `${folder}/${fileName}`;
-
-    const { data, error } = await supabase.storage
-      .from(folder)
-      .upload(filePath, await fetch(file.uri).then((r) => r.blob()));
-
-    if (error) throw error;
-
-    // Return public URL
-    const { data: publicUrlData } = supabase.storage.from(folder).getPublicUrl(filePath);
-    return publicUrlData.publicUrl;
-  };
-
   const handleSubmit = async () => {
     if (!title || !videoFile || !thumbnailFile) {
       Alert.alert("Error", "Please provide title, video, and thumbnail.");
       return;
     }
 
-    try {
-      setLoading(true);
+    setLoading(true);
 
-      // Upload video and thumbnail
-      const videoUrl = await uploadFile(videoFile, "videos");
-      const thumbnailUrl = await uploadFile(thumbnailFile, "thumbnails");
+    const result = await createVideo({
+      title,
+      aiPrompt,
+      videoFile,
+      thumbnailFile,
+      userId: user?.id!,
+    });
 
-      // Insert metadata into Supabase table
-      const { error } = await supabase.from("videos").insert([
-        {
-          title,
-          url: videoUrl,
-          thumbnail_url: thumbnailUrl,
-          creator_id: user?.id,
-          ai_prompt: aiPrompt,
-        },
-      ]);
+    setLoading(false);
 
-      if (error) throw error;
-
+    if (result.success) {
       Alert.alert("Success", "Video uploaded successfully!");
       setTitle("");
       setAiPrompt("");
@@ -80,11 +112,8 @@ export default function Create() {
       setThumbnailFile(null);
 
       router.replace("/(tabs)/home");
-    } catch (error) {
-      console.error("Upload error:", error);
+    } else {
       Alert.alert("Error", "Failed to upload video.");
-    } finally {
-      setLoading(false);
     }
   };
 
