@@ -4,6 +4,7 @@ import { Video, AVPlaybackStatus, ResizeMode } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 
 interface VideoType {
+  id?: string;
   title?: string;
   creator?: string;
   url?: string;

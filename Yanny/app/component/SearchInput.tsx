@@ -1,8 +1,23 @@
-import { View, TextInput, Image, TouchableOpacity } from "react-native";
-import { useState } from "react";
+import { View, TextInput, Image, TouchableOpacity, Alert } from "react-native";
+import { useState, useEffect } from "react";
+import { useRouter } from "expo-router";
 
-export default function SearchInput() {
-  const [query, setQuery] = useState("");
+export default function SearchInput({ initialQuery = "" }) {
+  const [query, setQuery] = useState(initialQuery);
+  const router = useRouter();
+
+  // Update local state if initialQuery changes (when navigating back)
+  useEffect(() => {
+    setQuery(initialQuery);
+  }, [initialQuery]);
+
+  const onSearch = () => {
+    if (!query.trim()) {
+      Alert.alert("Please enter a search term");
+      return;
+    }
+    router.push(`/search/${encodeURIComponent(query.trim())}`);
+  };
 
   return (
     <View className="bg-neutral-800 rounded-xl flex-row items-center px-4 py-3 mt-4">
@@ -13,8 +28,7 @@ export default function SearchInput() {
         value={query}
         onChangeText={setQuery}
       />
-
-      <TouchableOpacity onPress={() => console.log("Search clicked!")}>
+      <TouchableOpacity onPress={onSearch}>
         <Image
           source={require("../../assets/images/search.png")}
           className="w-5 h-5 ml-2"

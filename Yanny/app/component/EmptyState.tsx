@@ -1,28 +1,19 @@
-import { View, Text, Image } from "react-native";
-import CustomButton from "./customButton";
-import { useRouter } from "expo-router";
+import { View, Text, Image, StyleSheet } from "react-native";
 
-
-export default function EmptyState() {
-  const router = useRouter();
-
+export default function EmptyState({ message = "No items found" }) {
   return (
-    <View className="flex-1 items-center justify-center p-6">
+    <View style={styles.container}>
       <Image
-          source={require("../../assets/images/search.png")}
-          className="w-5 h-5 ml-2"
-        />
-
-      <Text className="text-2xl font-bold mb-2">No videos found</Text>
-      <Text className="text-gray-500 text-center mb-6">
-        Be the first one to upload a video
-      </Text>
-      <CustomButton
-        title="Create Video"
-        handlePress={() => router.push("./create-video")}
-        isLoading={false}
+        source={require("../../assets/images/empty.png")}
+        style={styles.image}
       />
-
+      <Text style={styles.text}>{message}</Text>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
+  image: { width: 150, height: 150, marginBottom: 20 },
+  text: { fontSize: 16, color: "#666", textAlign: "center" },
+});
